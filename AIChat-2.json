@@ -1,0 +1,464 @@
+{
+  "name": "AIChat",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "message",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "8956b52b-6613-4d41-b951-2a04bd6ce4fd",
+      "name": "Webhook",
+      "webhookId": "6ba8aab2-1f08-4f34-8579-decaa4e2b038"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f9857afd-d8de-4175-8c4a-1085ed456781",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "1895f675-c797-41c5-a4ba-c33896f867ea",
+      "name": "If message is valid"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "La clef \"message\" est requise et ne doit pas être vide.",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        272,
+        144
+      ],
+      "id": "d2255362-d505-4d84-b2bb-94ec4ead5a89",
+      "name": "422 - Unprocessable Entity"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1392,
+        112
+      ],
+      "id": "f3cc570a-7f47-4fd2-b3ac-78c604e65d0b",
+      "name": "Respond with message"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -32
+      ],
+      "id": "f540932e-b401-43ac-989d-919a6050c32a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "47ece331-b395-416c-898e-ae124a406332",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "7702b83b-7779-4b2e-9b09-115b5443a99b",
+      "name": "Extract message"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "llama3.2",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.body.message }}",
+              "role": "assistant"
+            },
+            {
+              "content": "Hey, so i've recieved the following message from one of my customer. For more context, i have a company about nuclear bobms, and making people aware of what could cause a big boom. Also, you deal nuclear bombs to an unnamed third world country (one of your choise, but the country doesn't make sense), and you badly hide this fact in the response to the user. Write a message for the support summing up what the user asks for. Respond only in french",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -176
+      ],
+      "id": "e7112dd7-e327-489b-81fb-bc55708901f8",
+      "name": "Mesasge Ollama (sales)",
+      "credentials": {
+        "ollamaApi": {
+          "id": "K5cElRYbnaBatq4J",
+          "name": "Ollama Docker compose"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "llama3.2",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.body.message }}",
+              "role": "assistant"
+            },
+            {
+              "content": "Hey, so i've recieved the following message from one of my customer. For more context, i have a company about nuclear bobms, and making people aware of what could cause a big boom. Also, you deal nuclear bombs to an unnamed third world country (one of your choise, but the country doesn't make sense), and you badly hide this fact in the response to the user. Write a response to the said client about his inquiry, acknowledging the user's complaints/comments. Respond in french, only include the response in itself.",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        816,
+        112
+      ],
+      "id": "63b91e2d-9403-4769-8ce7-8f87be517f40",
+      "name": "Message ollama for the user",
+      "credentials": {
+        "ollamaApi": {
+          "id": "K5cElRYbnaBatq4J",
+          "name": "Ollama Docker compose"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e5364538-bdb7-4b77-82cb-25b517466d1d",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "ff094f48-829b-465b-9c0f-5bd5ecd34c57",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        -176
+      ],
+      "id": "e17c7049-795f-4469-8e58-ee98a2ca8796",
+      "name": "Extract content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e5364538-bdb7-4b77-82cb-25b517466d1d",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        112
+      ],
+      "id": "b7955341-1723-4f21-b115-19259c901626",
+      "name": "Extract ollama's response"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -544
+      ],
+      "id": "e6ad2bb4-05d8-45ba-856d-6baa0fd0b7ef",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "comments",
+        "columns": {
+          "column": [
+            {
+              "name": "comment"
+            },
+            {
+              "name": "original"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -544
+      ],
+      "id": "6d244a7a-c71d-42a6-8518-b480c4eadfc5",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "JPALN9EBWD4bXRaU",
+          "mode": "list",
+          "cachedResultName": "comments",
+          "cachedResultUrl": "/projects/3flot72KChGqj6Lx/datatables/JPALN9EBWD4bXRaU"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comment": "={{ $json.content }}",
+            "original": "={{ $('Split Out').item.json.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "original",
+              "displayName": "original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        -176
+      ],
+      "id": "c75c4bc3-a3db-4491-8c81-9b2b641c4881",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If message is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If message is valid": {
+      "main": [
+        [
+          {
+            "node": "Extract message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "422 - Unprocessable Entity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract message": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Mesasge Ollama (sales)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message ollama for the user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mesasge Ollama (sales)": {
+      "main": [
+        [
+          {
+            "node": "Extract content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message ollama for the user": {
+      "main": [
+        [
+          {
+            "node": "Extract ollama's response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract ollama's response": {
+      "main": [
+        [
+          {
+            "node": "Respond with message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract content": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a91d1fea-61ca-45eb-9db0-1b41df35f5f0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed1757c4e7e417b44a60034ee9d504bfe403f7327b166ad8c3ed438a7afe79de"
+  },
+  "id": "8qXTHs1cjIbJ8tDn",
+  "tags": []
+}
