@@ -1,0 +1,191 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bb72e2df-74fc-4557-a91c-de688b116e5e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: {name: \"bouvier bernois\", age: 4}, },\n  { json: {name: \"border collie\", age: 21}, },\n  { json: {name: \"samoyede\", age: 2}, },\n  { json: {name: \"terre neuve\", age: 31}, },\n  { json: {name: \"golden retriever\", age: 3}, },\n  { json: {name: \"malamute\", age: 18}, },\n  { json: {name: \"berger australien\", age: 67}, },\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b678db8d-d0b1-4836-ae2e-74f139bfbaf9",
+      "name": "DataMock"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((el) => {\n  el.json.is_adulte = (el.json.age >= 18)\n  return el\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "8089a1dc-b7be-41f0-8a75-565f826a1dd8",
+      "name": "Epstein checker"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "is_adulte",
+        "include": "allOtherFields",
+        "options": {
+          "includeBinary": true
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "bd41d379-2a77-4c9a-9c5b-33b96f98e69e",
+      "name": "Split Out",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "name",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        -16
+      ],
+      "id": "ed7d4a5a-ce25-46fe-b285-4a41769d02c2",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(el => {\n  el.json.bouvier = Date.now()\n  return el\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -112
+      ],
+      "id": "7dde6b46-29e2-42f1-bafc-becf1ed5875e",
+      "name": "Timestamp Number 1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(el => {\n  el.json.timestamp = Date.now()\n  return el\n})"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        128
+      ],
+      "id": "8aaf0a80-8a38-4999-be48-80c27506ddab",
+      "name": "Timestamp 2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "DataMock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DataMock": {
+      "main": [
+        [
+          {
+            "node": "Epstein checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Epstein checker": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Timestamp 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Timestamp Number 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "Timestamp Number 1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Timestamp 2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b68765b8-20b1-48f0-9922-ecbd0c0a1fd9",
+  "meta": {
+    "instanceId": "ed1757c4e7e417b44a60034ee9d504bfe403f7327b166ad8c3ed438a7afe79de"
+  },
+  "id": "afARvsMtCbAHd8AM",
+  "tags": []
+}

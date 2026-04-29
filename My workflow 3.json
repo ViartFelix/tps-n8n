@@ -1,0 +1,397 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "epstein",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        128
+      ],
+      "id": "b098a682-ca32-4cf2-b6ad-19ca96334af1",
+      "name": "Webhook",
+      "webhookId": "7b8332b9-42ef-438f-9ab3-1579ba1c7054"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "5UYkAvjH1zylxDhg",
+          "mode": "list",
+          "cachedResultName": "clients",
+          "cachedResultUrl": "/projects/3flot72KChGqj6Lx/datatables/5UYkAvjH1zylxDhg"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.body.name }}",
+            "email": "={{ $json.body.email }}",
+            "message": "={{ $json.body.message }}",
+            "age": "={{ $json.body.age }}",
+            "source": "={{ $json.body.source }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        64
+      ],
+      "id": "3be3373d-d80f-4f32-93d1-4f2079c054fb",
+      "name": "Insert row",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -352
+      ],
+      "id": "8103e6ea-69e1-489c-8038-d6b27c0a5874",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "delete",
+        "dataTableId": {
+          "__rl": true,
+          "value": "j4BdOWjvX9iQ4AJI",
+          "mode": "list",
+          "cachedResultName": "clients",
+          "cachedResultUrl": "/projects/3flot72KChGqj6Lx/datatables/j4BdOWjvX9iQ4AJI"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -352
+      ],
+      "id": "a1b84048-ae91-4169-856c-91ea7e037761",
+      "name": "Delete a data table"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "clients",
+        "columns": {
+          "column": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "message"
+            },
+            {
+              "name": "age",
+              "type": "number"
+            },
+            {
+              "name": "source"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        -352
+      ],
+      "id": "1c5345d3-969b-45d0-8725-f40960b6d20e",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a463d02a-d4f1-4875-9b9f-1799c55b8680",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "={{ $json.body.email }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "19b64ccb-3338-4fe3-839b-6d96db644428",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1f9abc27-f530-4462-af62-72e5c972020c",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cc580965-f0a1-43fc-8eb3-acfaa1646d0a",
+              "leftValue": "={{ $json.body.age }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f10b5788-ee81-4ea3-863f-ba1d9655a78c",
+              "leftValue": "={{ $json.body.age }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "fc39266b-19bb-4d65-bc1c-bb95d3195e35",
+              "leftValue": "={{ $json.body.source }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        128
+      ],
+      "id": "8cf370cb-9c9b-4a14-97d3-f147407f17ae",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Unknown error when inserting the data in the client flight list ™",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        736,
+        176
+      ],
+      "id": "ca939c7f-e5c0-4fff-9938-47448ed52431",
+      "name": "Error insert"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Si tu veux aller sur l'ile, il faut remplir tous les champs ! <3",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        736,
+        400
+      ],
+      "id": "e63886c0-cfc1-48f3-b517-d1270b53e276",
+      "name": "Not valid form"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Ok, je vous envoie un agent ™",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        736,
+        -48
+      ],
+      "id": "c63b014c-597d-4913-a553-02629a1691cd",
+      "name": "Success insert"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Delete a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a data table": {
+      "main": [
+        [
+          {
+            "node": "Create a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Success insert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not valid form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Success insert": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4d861236-9f8f-41af-a15e-2387414e8f83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed1757c4e7e417b44a60034ee9d504bfe403f7327b166ad8c3ed438a7afe79de"
+  },
+  "id": "pN3WdHGCdbivZPuF",
+  "tags": []
+}
