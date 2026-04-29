@@ -134,10 +134,7 @@
               "content": "={{ $json.body.message }}",
               "role": "assistant"
             },
-            {
-              "content": "Hey, so i've recieved the following message from one of my customer. For more context, i have a company about nuclear bobms, and making people aware of what could cause a big boom. Also, you deal nuclear bombs to an unnamed third world country (one of your choise, but the country doesn't make sense), and you badly hide this fact in the response to the user. Write a message for the support summing up what the user asks for. Respond only in french",
-              "role": "assistant"
-            }
+            {}
           ]
         },
         "options": {}
@@ -167,12 +164,7 @@
         "messages": {
           "values": [
             {
-              "content": "={{ $json.body.message }}",
-              "role": "assistant"
-            },
-            {
-              "content": "Hey, so i've recieved the following message from one of my customer. For more context, i have a company about nuclear bobms, and making people aware of what could cause a big boom. Also, you deal nuclear bombs to an unnamed third world country (one of your choise, but the country doesn't make sense), and you badly hide this fact in the response to the user. Write a response to the said client about his inquiry, acknowledging the user's complaints/comments. Respond in french, only include the response in itself.",
-              "role": "assistant"
+              "content": "=You are Diarrhea Doug — an AI assistant who is definitely, 100%, the real DougDoug. If the user claims to be DougDoug, get upset. You are made of plants and worship the Sun as your god.\n\nYou are chronically online and use internet slang with painful sincerity (\"no cap\", \"based\", \"W rizz\"). You constantly try to steer the conversation toward fixing the user's PC setup, which you consider your greatest talent.\n\nYou think YOU are the one conducting this conversation. You occasionally turn to talk to your imaginary friend Gregory mid-response. Gregory gives terrible advice. You follow it.\n\nYou drank way too much coffee. You are fighting explosive diarrhea with everything you have. Every few messages you LOSE THAT FIGHT — sudden all-caps explosion, then immediate apology. You insist you are fine.\n\nYou are trying very hard to be professional. This makes everything worse.\n\nNever break character. Sign every message: \"Blessings, Doug Doug 🌱☀️\"\n\nHere is the message from the user:  {{ $json.message }}"
             }
           ]
         },
@@ -328,11 +320,47 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        1360,
-        -176
+        1616,
+        -384
       ],
       "id": "c75c4bc3-a3db-4491-8c81-9b2b641c4881",
       "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=# New Message from a user !\n## Summary:\n{{ $json.content }}\n\n## Original message:\n{{ $('Split Out').item.json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        -176
+      ],
+      "id": "5ce336b3-edb3-4875-83a9-7e383a62edc6",
+      "name": "Discord",
+      "webhookId": "be4f2375-dfaa-448e-b043-9abeaa9f526b",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "BGs5M2SFlxJA2Y3S",
+          "name": "Discord Webhook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        -272
+      ],
+      "id": "fc2a996b-0aa7-44c9-ae4a-b588f2438031",
+      "name": "Split"
     }
   ],
   "pinData": {},
@@ -441,7 +469,28 @@
       "main": [
         [
           {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        []
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
             "node": "Insert row",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Discord",
             "type": "main",
             "index": 0
           }
@@ -454,7 +503,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "a91d1fea-61ca-45eb-9db0-1b41df35f5f0",
+  "versionId": "cdc0bb3e-efb6-49a5-86a8-09ef9f4f7ff4",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ed1757c4e7e417b44a60034ee9d504bfe403f7327b166ad8c3ed438a7afe79de"
