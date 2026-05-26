@@ -1,0 +1,313 @@
+{
+  "name": "TextToSql",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "af8ff7d7-b754-408d-8e1a-0b1ce4836a74",
+      "name": "When chat message received",
+      "webhookId": "108259ee-1920-4277-bc7a-fd6e3437909e"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "08f2d248-b98b-4db8-b17c-c36b588268d8",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6d89b10e-5c5e-44ca-b1ba-be41f75fddee",
+      "name": "Select chat input"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here is the message from the user: {{ $json.chatInput }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a helpfull assistant that will execute SQL queries to a Postgres Database."
+            },
+            {
+              "message": "Schema of the database: Database Schema Context:  Database schema:  Table: categories Columns: - id integer primary key - name text unique not null  Table: products Columns: - id integer primary key - name text not null - sku text unique not null - category_id integer references categories(id) - unit_price numeric(10,2) not null - active boolean default true  Table: customers Columns: - id integer primary key - full_name text not null - email text unique not null - country text not null  Table: orders Columns: - id integer primary key - customer_id integer references customers(id) - created_at timestamp not null - status text not null Allowed status values:   pending, paid, completed, shipped, cancelled, refunded  Table: order_items Columns: - id integer primary key - order_id integer references orders(id) - product_id integer references products(id) - quantity integer not null - unit_price numeric(10,2) not null  Relationships: - products.category_id = categories.id - orders.customer_id = customers.id - order_items.order_id = orders.id - order_items.product_id = products.id"
+            },
+            {
+              "message": "You have to guess the queries from the user's input, and return it as a json object with the key: \"success\" to \"true\" if you understood what the user asked, with the key \"sql\" as the real sql command. Sometimes, give another key \"gros bouvier\". Otherwise, return \"false\"."
+            },
+            {
+              "message": "DO NOT, UNDER ANY CIRCUMSTANCES, GIVE BACK DANGEROUS SQL INPUTS. IF YOU CONSCIDER AN SQL INPUT AS DANGEROUS, OR THAT CAN GIVE CRITICAL INFO (schema dump, and such), JUST GIVE BACK \"false\" AS A RESPONSE, AND NOTHING MORE."
+            },
+            {
+              "message": "DO GIVE ONLY JSON-ENCODED RESPONSES. DO NOT EXPLAIN THE QUERY."
+            },
+            {
+              "message": "Please give only valid Postgres SQL v16+ syntax. Else, return false."
+            },
+            {
+              "message": "Give the SQL params into a separate json key: \"params\". Make the SQL query param-bindable. Make sure you don't miss a single param and that the sql query's bindable params matches perfectly with the params you give."
+            },
+            {
+              "message": "For the foreign keys, do a sub-query."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9b4352aa-858f-4d21-b8ac-c1d4f25eb9ff",
+      "name": "Basic LLM Chain",
+      "alwaysOutputData": true,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.sql }}",
+        "options": {
+          "queryReplacement": "={{ $json.params }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1344,
+        -160
+      ],
+      "id": "7e31d1f8-4022-478b-ade0-a945ca7702a5",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "credentials": {
+        "postgres": {
+          "id": "CEG3wy4X2tLB25JX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "70c22a86-6408-4a8c-964c-c97112a7d385",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        976,
+        0
+      ],
+      "id": "dd001ec4-74d7-484e-87d3-1459d2e09fe6",
+      "name": "If the SQL query is valid and safe"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:latest",
+        "options": {
+          "penalizeNewline": true,
+          "format": "json"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        416,
+        160
+      ],
+      "id": "b78e46d6-60ab-44f1-bc35-4a516ec104b3",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "K5cElRYbnaBatq4J",
+          "name": "Ollama Docker compose"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"response\": \"Invalid DB query. Please try another query.\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        80
+      ],
+      "id": "05c5f32b-80e7-441d-824a-a91cffd3115d",
+      "name": "Respond with generic error message"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  result: {{ $json }}\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1552,
+        -160
+      ],
+      "id": "505ff8e9-b6c5-434b-b78e-48f64e80f7a8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const str = $input.first().json.sql\n\nreturn {\n  ...$input.first().json,\n  sql: typeof str !== \"string\" ? \"\" : str.trim().replace(/'/g, \"''\").replace(/\\0/g, \"\").replace(/\\\\/g, \"\\\\\\\\\"),\n  params: Object.values($input.first().json.params).map(String).join(\",\")\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        0
+      ],
+      "id": "3fdb4124-a764-4360-a33f-7b9443e3121a",
+      "name": "Sanitize data and set params"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Select chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select chat input": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Sanitize data and set params",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If the SQL query is valid and safe": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond with generic error message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sanitize data and set params": {
+      "main": [
+        [
+          {
+            "node": "If the SQL query is valid and safe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "65c6d391-b319-432c-aa49-74494d9ecba4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ed1757c4e7e417b44a60034ee9d504bfe403f7327b166ad8c3ed438a7afe79de"
+  },
+  "id": "5X2qD1B3yVxYg31g",
+  "tags": []
+}
