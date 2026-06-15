@@ -1,5 +1,4 @@
 .env
-./n8n-data
-./documents
-./qdrant-data
-./ollama-data
+n8n-data
+qdrant-data
+ollama-data
